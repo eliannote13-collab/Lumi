@@ -65,11 +65,32 @@ export const useWebRTC = (roomId: string, userId: string, userName: string) => {
     return `http://${hostname}:3001`;
   };
 
-  // Dynamic ICE/TURN servers list
+  // Dynamic ICE/TURN servers list (using your Metered TURN servers as the default client fallback)
   const iceServersRef = useRef<RTCIceServer[]>([
-    { urls: "stun:stun.l.google.com:19302" },
-    { urls: "stun:stun1.l.google.com:19302" },
-    { urls: "stun:stun2.l.google.com:19302" }
+    {
+      urls: "stun:stun.relay.metered.ca:80",
+    },
+    {
+      urls: "turn:br.relay.metered.ca:80",
+      username: "111ba03923c126c367b7f7a8",
+      credential: "MZU6qfnODu99E6Vs",
+    },
+    {
+      urls: "turn:br.relay.metered.ca:80?transport=tcp",
+      username: "111ba03923c126c367b7f7a8",
+      credential: "MZU6qfnODu99E6Vs",
+    },
+    {
+      urls: "turn:br.relay.metered.ca:443",
+      username: "111ba03923c126c367b7f7a8",
+      credential: "MZU6qfnODu99E6Vs",
+    },
+    {
+      urls: "turns:br.relay.metered.ca:443?transport=tcp",
+      username: "111ba03923c126c367b7f7a8",
+      credential: "MZU6qfnODu99E6Vs",
+    },
+    { urls: "stun:stun.l.google.com:19302" }
   ]);
 
   // Load ICE/TURN servers from backend
