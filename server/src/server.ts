@@ -11,6 +11,27 @@ app.get("/health", (req, res) => {
   res.send({ status: "healthy", time: new Date() });
 });
 
+// ICE/TURN servers endpoint
+app.get("/ice-servers", (req, res) => {
+  const defaultServers = [
+    { urls: "stun:stun.l.google.com:19302" },
+    { urls: "stun:stun1.l.google.com:19302" },
+    { urls: "stun:stun2.l.google.com:19302" }
+  ];
+
+  if (process.env.ICE_SERVERS) {
+    try {
+      const customServers = JSON.parse(process.env.ICE_SERVERS);
+      return res.json(customServers);
+    } catch (err) {
+      console.error("Failed to parse ICE_SERVERS environment variable:", err);
+      return res.json(defaultServers);
+    }
+  }
+
+  return res.json(defaultServers);
+});
+
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {

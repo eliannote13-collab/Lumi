@@ -1,14 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
 
-// WebRTC peer connection configuration
-const RTC_CONFIG: RTCConfiguration = {
-  iceServers: [
-    { urls: "stun:stun.l.google.com:19302" },
-    { urls: "stun:stun1.l.google.com:19302" },
-    { urls: "stun:stun2.l.google.com:19302" }
-  ]
-};
+
 
 export interface RemotePeer {
   userId: string;
@@ -71,6 +64,32 @@ export const useWebRTC = (roomId: string, userId: string, userName: string) => {
     }
     return `http://${hostname}:3001`;
   };
+
+  // Dynamic ICE/TURN servers list
+  const iceServersRef = useRef<RTCIceServer[]>([
+    { urls: "stun:stun.l.google.com:19302" },
+    { urls: "stun:stun1.l.google.com:19302" },
+    { urls: "stun:stun2.l.google.com:19302" }
+  ]);
+
+  // Load ICE/TURN servers from backend
+  useEffect(() => {
+    if (!roomId) return;
+    const fetchIceServers = async () => {
+      try {
+        const socketUrl = getSocketUrl();
+        const res = await fetch(`${socketUrl}/ice-servers`);
+        if (res.ok) {
+          const servers = await res.json();
+          iceServersRef.current = servers;
+          console.log("Loaded remote ICE servers successfully:", servers);
+        }
+      } catch (err) {
+        console.warn("Failed to fetch remote ICE servers, falling back to default STUN:", err);
+      }
+    };
+    fetchIceServers();
+  }, [roomId]);
 
   // Toggle Camera
   const toggleCamera = () => {
@@ -557,7 +576,9 @@ export const useWebRTC = (roomId: string, userId: string, userName: string) => {
     }
 
     console.log(`Initializing RTCPeerConnection for user ${targetUserName}`);
-    const pc = new RTCPeerConnection(RTC_CONFIG);
+    const pc = new RTCPeerConnection({
+      iceServers: iceServersRef.current
+    });
     pcsRef.current.set(targetUserId, pc);
     makingOfferRef.current.set(targetUserId, false);
 

@@ -20,6 +20,10 @@ export default function App() {
   const [isJoined, setIsJoined] = useState(false);
   const [inputRoomId, setInputRoomId] = useState("");
   const [copied, setCopied] = useState(false);
+  const [isGuest] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.has("room");
+  });
   
   // Lobby navigation states
   const [showInviteInput, setShowInviteInput] = useState(false);
@@ -406,13 +410,15 @@ export default function App() {
           </div>
 
           {/* Activity selector component */}
-          <div className="hidden md:block">
-            <ActivitySelector
-              currentActivity={webrtc.currentActivity}
-              onChangeActivity={webrtc.changeActivity}
-              isHost={true}
-            />
-          </div>
+          {!isGuest && (
+            <div className="hidden md:block">
+              <ActivitySelector
+                currentActivity={webrtc.currentActivity}
+                onChangeActivity={webrtc.changeActivity}
+                isHost={true}
+              />
+            </div>
+          )}
 
           {/* Room actions: Share / Copy */}
           <div className="flex items-center gap-2">
