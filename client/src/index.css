@@ -1,0 +1,103 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-display: 'Outfit', system-ui, -apple-system, sans-serif;
+
+  --color-cozy-black: #0B0A09;
+  --color-cozy-charcoal: #141210;
+  --color-cozy-cream: #F4F3F0;
+  --color-cozy-amber: #D97706;
+  --color-cozy-gold: #F59E0B;
+  --color-cozy-sunset: #E11D48;
+  --color-cozy-gray: #24201C;
+  --color-cozy-gray-light: #3E3832;
+
+  --animate-float-up: float-up 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  --animate-pulse-slow: pulse-slow 8s ease-in-out infinite;
+  --animate-fade-in: fade-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes float-up {
+  0% {
+    transform: translateY(10px) scale(0.6);
+    opacity: 0;
+  }
+  15% {
+    transform: translateY(-5px) scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-80px) scale(0.8) translateX(var(--drift-x, 15px));
+    opacity: 0;
+  }
+}
+
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 0.15;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.98) translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+html, body, #root {
+  background-color: var(--color-cozy-black);
+  color: var(--color-cozy-cream);
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+}
+
+/* Custom scrollbar for a premium look */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-cozy-black);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-cozy-gray);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-cozy-gray-light);
+}
+
+/* Glassmorphism helpers */
+.cozy-glass {
+  background: rgba(20, 18, 16, 0.6);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(244, 243, 240, 0.04);
+}
+
+.cozy-glass-light {
+  background: rgba(244, 243, 240, 0.03);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(244, 243, 240, 0.06);
+}
+
+/* Hide native controls when screen sharing is in dim mode */
+.dim-mode {
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
