@@ -61,6 +61,9 @@ export const useWebRTC = (roomId: string, userId: string, userName: string) => {
 
   // Setup Socket URL based on current host (supports mobile testing on local network)
   const getSocketUrl = () => {
+    if (import.meta.env.VITE_WS_URL) {
+      return import.meta.env.VITE_WS_URL;
+    }
     const hostname = window.location.hostname;
     // For local dev, backend is on 3001
     if (hostname === "localhost" || hostname === "127.0.0.1") {
