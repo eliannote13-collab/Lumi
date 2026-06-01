@@ -431,6 +431,18 @@ export const useWebRTC = (roomId: string, userId: string, userName: string) => {
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         }
       ]);
+
+      // If we are currently sharing screen, send the start event again so the new user knows
+      if (screenStreamRef.current) {
+        socket.emit("send-reaction", {
+          roomId,
+          reaction: {
+            type: "screen-share-start",
+            userId,
+            streamId: screenStreamRef.current.id
+          }
+        });
+      }
     });
 
     // Handle incoming WebRTC signaling data (SDP and ICE Candidates using Perfect Negotiation)
@@ -503,8 +515,21 @@ export const useWebRTC = (roomId: string, userId: string, userName: string) => {
         });
       } else if (payload.type === "screen-share-start") {
         remoteScreenStreamIdsRef.current.set(payload.userId, payload.streamId);
-        // Force state update to attach tracks correctly
-        setPeers((prev) => new Map(prev));
+        setPeers((prev) => {
+          const next = new Map(prev);
+          const peer = next.get(payload.userId);
+          if (peer) {
+            const updatedPeer = { ...peer };
+            // If the screen share stream was mistakenly assigned to peer.stream, swap them
+            if (updatedPeer.stream && updatedPeer.stream.id === payload.streamId) {
+              const temp = updatedPeer.stream;
+              updatedPeer.stream = updatedPeer.screenStream;
+              updatedPeer.screenStream = temp;
+            }
+            next.set(payload.userId, updatedPeer);
+          }
+          return next;
+        });
       } else if (payload.type === "screen-share-stop") {
         remoteScreenStreamIdsRef.current.delete(payload.userId);
         setPeers((prev) => {
@@ -640,7 +665,10 @@ export const useWebRTC = (roomId: string, userId: string, userName: string) => {
 
       // Check if this stream is a screen share stream
       const screenStreamId = remoteScreenStreamIdsRef.current.get(targetUserId);
-      const isScreenShare = screenStreamId === remoteStream.id;
+      
+      // A stream is screen share if:
+      // 1. Its ID matches the screenStreamId we received from the socket.
+      let isScreenShare = screenStreamId ? (screenStreamId === remoteStream.id) : false;
 
       setPeers((prev) => {
         const next = new Map(prev);
@@ -654,13 +682,20 @@ export const useWebRTC = (roomId: string, userId: string, userName: string) => {
           isVideoActive: true
         };
 
-        if (isScreenShare) {
-          peer.screenStream = remoteStream;
-        } else {
-          peer.stream = remoteStream;
+        const updatedPeer = { ...peer };
+
+        // 2. OR we already have a webcam stream and this is a different stream
+        if (updatedPeer.stream && updatedPeer.stream.id !== remoteStream.id) {
+          isScreenShare = true;
         }
 
-        next.set(targetUserId, peer);
+        if (isScreenShare) {
+          updatedPeer.screenStream = remoteStream;
+        } else {
+          updatedPeer.stream = remoteStream;
+        }
+
+        next.set(targetUserId, updatedPeer);
         return next;
       });
     };

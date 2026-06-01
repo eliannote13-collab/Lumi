@@ -200,19 +200,7 @@ export default function App() {
     window.history.pushState({}, "", window.location.pathname);
   };
 
-  // Helper to space out draggable cameras (only used when screen sharing is active)
-  const getInitialCoords = (idx: number, isLocalUser: boolean) => {
-    const isMobile = window.innerWidth < 768;
-    if (isMobile) {
-      const y = window.innerHeight - 240;
-      const x = isLocalUser ? 20 : 160 + idx * 135;
-      return { x, y, width: 120 };
-    } else {
-      const x = window.innerWidth - 300;
-      const y = isLocalUser ? 100 : 310 + idx * 210;
-      return { x, y, width: 260 };
-    }
-  };
+
 
   // Hook activation
   const webrtc = useWebRTC(
@@ -586,35 +574,8 @@ export default function App() {
                 </button>
               </div>
 
-              {/* Render Local User webcam draggable card in Alone view so they can adjust camera layout while waiting */}
-              <VideoCard
-                stream={webrtc.localStream}
-                userName={userName}
-                isLocal={true}
-                isAudioActive={webrtc.isAudioActive}
-                isVideoActive={webrtc.isVideoActive}
-                reactions={webrtc.reactions.filter((r) => r.userId === userId)}
-                initialX={getInitialCoords(0, true).x}
-                initialY={getInitialCoords(0, true).y}
-                initialWidth={getInitialCoords(0, true).width}
-                socketConnected={webrtc.isConnected}
-              />
-               </div>
-          )}
-
-          {/* ACTIVE SCREEN SHARING: Draggable webcams overlays */}
-          {activeShare && (
-            <div
-              className={
-                window.innerWidth < 768
-                  ? "flex flex-row gap-3.5 z-20 w-full overflow-x-auto py-2 justify-center" // mobile bottom horizontal row
-                  : isDimActive
-                    ? "absolute bottom-6 right-6 flex flex-row gap-3.5 z-20 w-auto transition-all duration-700" // desktop corner row in dim
-                    : "absolute top-6 right-6 w-56 md:w-64 flex flex-col gap-5 z-20 transition-all duration-700" // desktop standard stack sidebar
-              }
-            >
-              {/* Local User webcam */}
-              <div className={window.innerWidth < 768 ? "w-28 flex-shrink-0 aspect-[4/3]" : isDimActive ? "w-40 flex-shrink-0 aspect-[4/3]" : ""}>
+              {/* Render Local User webcam in Alone view in a neat relative container */}
+              <div className="w-64 aspect-[4/3] mt-6">
                 <VideoCard
                   stream={webrtc.localStream}
                   userName={userName}
@@ -622,17 +583,45 @@ export default function App() {
                   isAudioActive={webrtc.isAudioActive}
                   isVideoActive={webrtc.isVideoActive}
                   reactions={webrtc.reactions.filter((r) => r.userId === userId)}
-                  initialX={getInitialCoords(0, true).x}
-                  initialY={getInitialCoords(0, true).y}
-                  initialWidth={getInitialCoords(0, true).width}
-                  isSplit={window.innerWidth < 768} // disable drag on mobile
+                  initialX={0}
+                  initialY={0}
+                  isSplit={true}
+                  socketConnected={webrtc.isConnected}
+                />
+              </div>
+               </div>
+          )}
+
+          {/* ACTIVE SCREEN SHARING: Webcams overlays */}
+          {activeShare && (
+            <div
+              className={
+                window.innerWidth < 768
+                  ? "flex flex-row gap-3.5 z-20 w-full overflow-x-auto py-2 justify-center" // mobile bottom horizontal row
+                  : isDimActive
+                    ? "absolute bottom-6 right-6 flex flex-row gap-3.5 z-20 w-auto transition-all duration-700" // desktop corner row in dim
+                    : "w-56 md:w-64 flex flex-col gap-5 z-20 transition-all duration-700" // desktop standard stack sidebar (flex sibling!)
+              }
+            >
+              {/* Local User webcam */}
+              <div className={window.innerWidth < 768 ? "w-28 flex-shrink-0 aspect-[4/3]" : isDimActive ? "w-40 flex-shrink-0 aspect-[4/3]" : "w-full aspect-[4/3]"}>
+                <VideoCard
+                  stream={webrtc.localStream}
+                  userName={userName}
+                  isLocal={true}
+                  isAudioActive={webrtc.isAudioActive}
+                  isVideoActive={webrtc.isVideoActive}
+                  reactions={webrtc.reactions.filter((r) => r.userId === userId)}
+                  initialX={0}
+                  initialY={0}
+                  isSplit={true}
                   socketConnected={webrtc.isConnected}
                 />
               </div>
 
               {/* Remote Peers webcams */}
-              {Array.from(webrtc.peers.values()).map((peer, idx) => (
-                <div key={peer.userId} className={window.innerWidth < 768 ? "w-28 flex-shrink-0 aspect-[4/3]" : isDimActive ? "w-40 flex-shrink-0 aspect-[4/3]" : ""}>
+              {Array.from(webrtc.peers.values()).map((peer) => (
+                <div key={peer.userId} className={window.innerWidth < 768 ? "w-28 flex-shrink-0 aspect-[4/3]" : isDimActive ? "w-40 flex-shrink-0 aspect-[4/3]" : "w-full aspect-[4/3]"}>
                   <VideoCard
                     stream={peer.stream}
                     userName={peer.userName}
@@ -640,10 +629,9 @@ export default function App() {
                     isAudioActive={peer.isAudioActive}
                     isVideoActive={peer.isVideoActive}
                     reactions={webrtc.reactions.filter((r) => r.userId === peer.userId)}
-                    initialX={getInitialCoords(idx, false).x}
-                    initialY={getInitialCoords(idx, false).y}
-                    initialWidth={getInitialCoords(idx, false).width}
-                    isSplit={window.innerWidth < 768} // disable drag on mobile
+                    initialX={0}
+                    initialY={0}
+                    isSplit={true}
                     connectionState={peer.connectionState}
                     socketConnected={webrtc.isConnected}
                   />
