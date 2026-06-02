@@ -266,9 +266,7 @@ export default function App() {
             </h1>
           </div>
           
-          <p className="text-xs text-amber-200/90 font-sans text-center mb-8 max-w-[280px] leading-relaxed bg-stone-900/40 border border-stone-850/50 p-3 rounded-2xl">
-            Sala de cinema feito Elian para Ster a pessoa que amo nesse mundo, Feliz dia dos namorados meu amor. Agora vamos desfrutar !! ❤️
-          </p>
+
 
           <div className="w-full space-y-4">
             {!showInviteInput ? (
@@ -337,9 +335,7 @@ export default function App() {
           <h2 className="text-lg font-bold font-display tracking-tight text-stone-100 mb-1">
             Confirmar presença
           </h2>
-          <p className="text-xs text-amber-200/90 font-sans text-center mb-5 max-w-[280px] leading-relaxed bg-stone-900/40 border border-stone-850/50 p-3 rounded-2xl">
-            Sala de cinema feito Elian para Ster a pessoa que amo nesse mundo, Feliz dia dos namorados meu amor. Agora vamos desfrutar !! ❤️
-          </p>
+
           <p className="text-[10px] text-stone-500 font-sans text-center mb-4">
             Como você gostaria de aparecer no espaço?
           </p>
@@ -431,15 +427,7 @@ export default function App() {
           </div>
         </header>
 
-        {/* Dedicated Love Banner */}
-        <div className={`w-full py-2 bg-gradient-to-r from-red-950/20 via-amber-950/20 to-red-950/20 border-b border-stone-900/60 text-center relative z-20 transition-all duration-700 ${
-          isDimActive ? "opacity-0 h-0 py-0 overflow-hidden pointer-events-none border-b-0" : ""
-        }`}>
-          <div className="max-w-4xl mx-auto px-6 flex items-center justify-center gap-2 text-xs font-sans text-amber-200/90 font-medium tracking-wide">
-            <span className="animate-pulse">💝</span>
-            <span className="text-center">Sala de cinema feito Elian para Ster a pessoa que amo nesse mundo, Feliz dia dos namorados meu amor. Agora vamos desfrutar !! ❤️</span>
-          </div>
-        </div>
+
 
         {/* Main workspace container */}
         <main 
